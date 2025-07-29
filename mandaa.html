@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>I Love You Manda 💗</title>
+  <style>
+    html, body {
+      margin: 0;
+      overflow: hidden;
+      background: #000;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    .scene {
+      width: 100vw;
+      height: 100vh;
+      perspective: 1000px;
+      cursor: grab;
+    }
+
+    .universe {
+      width: 100%;
+      height: 100%;
+      transform-style: preserve-3d;
+      position: relative;
+    }
+
+    .falling-text {
+      position: absolute;
+      color: #ff99cc;
+      font-weight: bold;
+      text-shadow: 0 0 10px #ff66cc, 0 0 20px #fff;
+      white-space: nowrap;
+      animation: fall 10s linear forwards;
+      transform-style: preserve-3d;
+    }
+
+    @keyframes fall {
+      0% {
+        opacity: 1;
+        transform: translate3d(var(--x), var(--startY), var(--z));
+      }
+      100% {
+        opacity: 0;
+        transform: translate3d(var(--x), var(--endY), var(--z));
+      }
+    }
+
+    /* Tombol musik */
+    #playButton {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      background: #ff66cc;
+      border: none;
+      border-radius: 8px;
+      color: white;
+      font-size: 16px;
+      padding: 10px 20px;
+      z-index: 1000;
+      cursor: pointer;
+      box-shadow: 0 0 10px #ff66cc;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Tombol Play Musik -->
+<button id="playButton">Putar Musik 🎵</button>
+
+<!-- Musik -->
+<audio id="bgMusic" loop>
+  <source src="lagu.mp3" type="audio/mpeg">
+  Browser tidak mendukung audio.
+</audio>
+
+<div class="scene" id="scene">
+  <div class="universe" id="universe"></div>
+</div>
+
+<script>
+  const universe = document.getElementById('universe');
+
+  function createFallingText() {
+    const text = document.createElement('div');
+    text.className = 'falling-text';
+    text.innerText = "I love you Manda 💗";
+
+    const size = Math.random() * 20 + 14;
+    const x = (Math.random() - 0.5) * window.innerWidth * 2 + 'px';
+    const z = (Math.random() - 0.5) * 1000 + 'px';
+    const startY = '-100px';
+    const endY = '120vh';
+
+    text.style.fontSize = size + 'px';
+    text.style.setProperty('--x', x);
+    text.style.setProperty('--z', z);
+    text.style.setProperty('--startY', startY);
+    text.style.setProperty('--endY', endY);
+    text.style.left = '50%';
+    text.style.top = '0px';
+
+    universe.appendChild(text);
+    setTimeout(() => text.remove(), 12000);
+  }
+
+  // Bikin banyak
+  setInterval(() => {
+    for (let i = 0; i < 4; i++) createFallingText();
+  }, 200);
+
+  // Gerakan kamera
+  let isDragging = false;
+  let lastX = 0, lastY = 0;
+  let rotateX = 0, rotateY = 0;
+  const scene = document.getElementById('scene');
+
+  const updateRotation = () => {
+    universe.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+  };
+
+  scene.addEventListener('mousedown', e => {
+    isDragging = true;
+    lastX = e.clientX;
+    lastY = e.clientY;
+  });
+
+  scene.addEventListener('mouseup', () => isDragging = false);
+  scene.addEventListener('mousemove', e => {
+    if (!isDragging) return;
+    rotateY += (e.clientX - lastX) * 0.4;
+    rotateX -= (e.clientY - lastY) * 0.4;
+    updateRotation();
+    lastX = e.clientX;
+    lastY = e.clientY;
+  });
+
+  // Touch
+  scene.addEventListener('touchstart', e => {
+    isDragging = true;
+    lastX = e.touches[0].clientX;
+    lastY = e.touches[0].clientY;
+  });
+  scene.addEventListener('touchend', () => isDragging = false);
+  scene.addEventListener('touchmove', e => {
+    if (!isDragging) return;
+    rotateY += (e.touches[0].clientX - lastX) * 0.4;
+    rotateX -= (e.touches[0].clientY - lastY) * 0.4;
+    updateRotation();
+    lastX = e.touches[0].clientX;
+    lastY = e.touches[0].clientY;
+  });
+
+  // Musik
+  const bgMusic = document.getElementById('bgMusic');
+  const playButton = document.getElementById('playButton');
+
+  playButton.addEventListener('click', () => {
+    if (bgMusic.paused) {
+      bgMusic.play();
+      playButton.innerText = "Pause Musik ⏸️";
+    } else {
+      bgMusic.pause();
+      playButton.innerText = "Putar Musik 🎵";
+    }
+  });
+</script>
+
+</body>
+</html>
